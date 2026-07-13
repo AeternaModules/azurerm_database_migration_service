@@ -19,14 +19,6 @@ EOT
     subnet_id           = string
     tags                = optional(map(string))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.database_migration_services : (
-        contains(["Premium_4vCores", "Standard_1vCores", "Standard_2vCores", "Standard_4vCores"], v.sku_name)
-      )
-    ])
-    error_message = "must be one of: Premium_4vCores, Standard_1vCores, Standard_2vCores, Standard_4vCores"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_database_migration_service's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
@@ -53,6 +45,9 @@ EOT
   #   source:    [from commonids.ValidateSubnetID] !ok
   # path: subnet_id
   #   source:    [from commonids.ValidateSubnetID] err != nil
+  # path: sku_name
+  #   condition: contains(["Premium_4vCores", "Standard_1vCores", "Standard_2vCores", "Standard_4vCores"], value)
+  #   message:   must be one of: Premium_4vCores, Standard_1vCores, Standard_2vCores, Standard_4vCores
   # path: tags
   #   condition: length(value) <= 50
   #   message:   [from tags.Validate: invalid when len(value) > 50]
